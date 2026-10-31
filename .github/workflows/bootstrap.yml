@@ -1,80 +1,76 @@
-name: FieldGuide GPS initial einrichten und APK bauen
+name: FieldGuide GPS Android APK automatisch bauen
 
 on:
   push:
     branches: [main]
-    paths:
-      - '.github/workflows/bootstrap.yml'
   workflow_dispatch:
 
 permissions:
   contents: write
-  actions: write
+
+concurrency:
+  group: fieldguide-apk
+  cancel-in-progress: true
 
 jobs:
-  initial-build:
+  android:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - name: Repository auschecken
+      - name: Projekt laden
         uses: actions/checkout@v4
         with:
           persist-credentials: true
 
-      - name: Android-Quellcode entpacken
+      - name: Erstimport des Quellcodes (nur einmal)
         shell: bash
         run: |
           set -euo pipefail
-          test -s transfer/source.tgz.b64
-          printf '%s  %s\n' 'dbaeb8ec95b89e8fa8495f44bfa3b684df6acf89bf40572e261efc9cc386f32c' transfer/source.tgz.b64 | sha256sum --check
-          base64 --decode transfer/source.tgz.b64 | tar -xz -C .
-          test -s app/src/main/java/de/exi/fieldguide/MainActivity.kt
-          test -s .github/workflows/android-apk.yml
-          rm -rf transfer
-          rm -f .github/workflows/bootstrap.yml
+          if [ -f transfer/source.tgz.b64 ]; then
+            echo 'dbaeb8ec95b89e8fa8495f44bfa3b684df6acf89bf40572e261efc9cc386f32c  transfer/source.tgz.b64' | sha256sum --check
+            base64 -d transfer/source.tgz.b64 | tar -xz -C .
+            test -s app/src/main/java/de/exi/fieldguide/MainActivity.kt
+            rm -rf transfer
+            rm -f .github/workflows/android-apk.yml
+            git config user.name 'fieldguide-bot'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add -A
+            git commit -m 'Import native FieldGuide GPS Android project'
+            git push origin HEAD:main
+          fi
 
-      - name: Quellcode versionieren
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "fieldguide-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Add full native Android FieldGuide GPS project"
-          git push origin HEAD:main
-
-      - name: Java 17 installieren
+      - name: Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Android SDK bereitstellen
+      - name: Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Android SDK 35 installieren
+      - name: Android SDK 35
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
 
-      - name: Gradle bereitstellen
+      - name: Gradle 8.13
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
 
-      - name: APK kompilieren
+      - name: APK erstellen
         run: gradle --no-daemon --stacktrace :app:assembleDebug
 
       - name: APK benennen
         run: cp app/build/outputs/apk/debug/app-debug.apk FieldGuideGPS.apk
 
-      - name: APK als Workflow-Download bereitstellen
+      - name: APK als Workflow-Artifact
         uses: actions/upload-artifact@v4
         with:
           name: FieldGuideGPS-APK
           path: FieldGuideGPS.apk
-          if-no-files-found: error
           retention-days: 30
+          if-no-files-found: error
 
-      - name: APK im Release bereitstellen
+      - name: Installierbare APK unter Releases
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -85,6 +81,6 @@ jobs:
             gh release create android-test FieldGuideGPS.apk \
               --target main \
               --title 'FieldGuide GPS – Android Testversion' \
-              --notes 'MVP: Visuelle GNSS-Spurführung, keine Autolenkung. Noch nicht auf Galaxy A55 getestet.' \
+              --notes 'MVP: visuelle GNSS-Spurführung, keine Autolenkung. Feldtest auf Galaxy A55 ausstehend.' \
               --prerelease
           fi
