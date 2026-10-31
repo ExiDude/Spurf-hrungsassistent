@@ -45,13 +45,10 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Android SDK 35 aus Runner verwenden
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "ANDROID_HOME=${ANDROID_HOME:-nicht gesetzt}"
-          command -v sdkmanager
-          sdkmanager --install 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Android SDK 35 installieren
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
       - name: Gradle 8.13
         uses: gradle/actions/setup-gradle@v4
