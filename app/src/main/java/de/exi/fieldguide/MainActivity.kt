@@ -197,7 +197,7 @@ class MainActivity : Activity() {
             }
         }
         topLine = TextView(this).apply {
-            textSize = 15f; setTextColor(foreground); setPadding(dp(6), dp(4), 0, dp(2))
+            textSize = 15f; setTextColor(this@MainActivity.foreground); setPadding(dp(6), dp(4), 0, dp(2))
         }
         gpsLine = TextView(this).apply {
             textSize = 12f; setTextColor(accent); setPadding(dp(6), dp(2), 0, dp(5))
@@ -214,7 +214,7 @@ class MainActivity : Activity() {
         }
         root.addView(surface, LinearLayout.LayoutParams(-1, 0, 1f))
         detailLine = TextView(this).apply {
-            textSize = 13f; setTextColor(foreground); gravity = Gravity.CENTER
+            textSize = 13f; setTextColor(this@MainActivity.foreground); gravity = Gravity.CENTER
             setPadding(dp(6), dp(7), dp(6), dp(7))
         }
         root.addView(detailLine)
