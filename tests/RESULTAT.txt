@@ -1,0 +1,1 @@
+PASS: WGS84 projection, A/B lanes, direction, antenna offset, area/perimeter, coverage overlap & clipping, invalid A/B

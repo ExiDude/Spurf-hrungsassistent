@@ -1,0 +1,36 @@
+FIELDGUIDE GPS – NUR ANDROID
+============================
+
+ZIEL: Eine APK zum Antippen und Installieren auf dem Samsung Galaxy A55.
+
+Dieses Archiv ist NOCH KEINE APK. Die APK wird durch einen automatischen
+Cloud-Build erzeugt; weder Windows noch Android Studio werden dazu benötigt.
+
+EINMALIGE CLOUD-EINRICHTUNG (GitHub):
+1. Auf https://github.com/new ein PRIVATES Repository "FieldGuideGPS" anlegen.
+2. Die Dateien und Ordner aus diesem Archiv ins Repository hochladen,
+   wobei der versteckte Ordner .github/workflows mit hochgeladen werden muss.
+3. GitHub baut nach dem Push automatisch die APK (Actions -> Workflow).
+4. Die APK steht unter "Releases" als "FieldGuideGPS.apk" bereit.
+
+AUF DEM GALAXY A55:
+1. FieldGuideGPS.apk antippen und installieren.
+2. Falls Android fragt: Installation aus dieser Quelle einmalig erlauben.
+3. App starten und "Präzisen Standort" freigeben.
+4. Feldgrenze und Arbeitsbreite erfassen; A und B setzen; Spurführung starten.
+
+WICHTIG:
+- Die Veröffentlichung aus einem Repository ist nur dann erreichbar,
+  wenn GitHub Actions und Schreibzugriff auf Releases aktiviert sind.
+- Ein Debug-APK-Build nutzt ein automatisch erzeugtes Testsignatur-Zertifikat.
+  Beim späteren Update aus einem erneuten Cloud-Build kann die Signatur
+  wechseln. Bis ein dauerhaftes Release-Zertifikat eingerichtet wurde,
+  kein Update ohne Datensicherung erwarten.
+- Smartphone-GNSS ist nicht für zentimetergenaue Spurführung geeignet.
+- APK-Build und A55-Gerätetest stehen noch aus.
+
+DATEIEN:
+- .github/workflows/android-apk.yml -> automatische Cloud-Kompilierung
+- app/ -> native Android-App und GPS-Funktionen
+- tests/ -> Geometrie-Kerntests
+- QA_STATUS.md -> tatsächlicher Prüfstand
